@@ -11,7 +11,11 @@ def create_app():
 
     os.makedirs(os.path.join(app.root_path, '..', 'instance'), exist_ok=True)
 
-    CORS(app)
+    # Load environment variables or fall back to defaults
+    frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+
+    # Allow requests from local dev server and deployed frontend
+    CORS(app, origins=[frontend_url, "http://localhost:3000", "http://localhost:5173"])
     db.init_app(app)
     JWTManager(app)
 
