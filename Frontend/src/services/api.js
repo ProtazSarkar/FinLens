@@ -38,7 +38,6 @@ export const api = {
 
   getUsers: () =>
     fetch(`${API_BASE}${ENDPOINTS.USERS.LIST}`, {
-      headers: getHeaders(),
     }).then(handleResponse),
 
   transfer: (payload) =>
@@ -50,7 +49,6 @@ export const api = {
 
   getAllTransactions: () =>
     fetch(`${API_BASE}${ENDPOINTS.TRANSACTIONS.ALL}`, {
-      headers: getHeaders(),
     }).then(handleResponse),
 };
 

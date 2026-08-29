@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -10,18 +12,24 @@ from api.transaction import transaction_bp
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    allowed_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3002",
+        "http://127.0.0.1:3002",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+        "https://smartledger-1-u3z7.onrender.com",
+    ]
+    configured_frontend = os.getenv("FRONTEND_URL")
+    if configured_frontend:
+        allowed_origins.append(configured_frontend.rstrip("/"))
+
     CORS(
         app,
-        resources={r"/api/*": {"origins": [
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://localhost:3002",
-            "http://127.0.0.1:3002",
-            "http://localhost:5173",
-            "http://127.0.0.1:5173",
-            "http://localhost:4173",
-            "http://127.0.0.1:4173",
-        ]}},
+        resources={r"/api/*": {"origins": allowed_origins}},
         supports_credentials=True,
         expose_headers=["Content-Type", "Authorization"],
     )
