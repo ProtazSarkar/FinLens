@@ -1,0 +1,18 @@
+# Web Framework & ORM
+Flask>=3.0.0
+Flask-SQLAlchemy>=3.1.0
+Flask-Cors>=4.0.0
+gunicorn>=21.2.0
+
+# Database & Drivers
+psycopg2-binary>=2.9.9
+PyMySQL>=1.1.0
+
+# Environment & Config
+python-dotenv>=1.0.0
+
+# Data Science / Machine Learning (for .pkl models)
+numpy>=1.26.0
+pandas>=2.1.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
