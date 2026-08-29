@@ -1,9 +1,20 @@
 import os
+from dotenv import load_dotenv
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+load_dotenv()
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'smartledger-super-secret-key')
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-smartledger-secret-key')
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(BASE_DIR, 'instance', 'database.db')}"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = os.getenv("SECRET_KEY", "smartledger-super-secret-key")
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "SQL_DATABASE_URI"
+    )
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "connect_args": {
+            "ssl": {
+                "check_hostname": False,
+                "ssl_mode": "REQUIRED"
+            }
+        },
+        "pool_recycle": 3600,
+        "pool_pre_ping": True
+    }

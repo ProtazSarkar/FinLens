@@ -1,17 +1,57 @@
+// Centralized API Configuration & Endpoints Map
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const getHeaders = () => {
-  const token = localStorage.getItem('token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
-  };
+export const ENDPOINTS = {
+  USERS: {
+    REGISTER: '/user/register',
+    LIST: '/user/all',
+  },
+  TRANSACTIONS: {
+    TRANSFER: '/transaction/transfer',
+    ALL: '/transaction/history/all',
+  },
+};
+
+const getHeaders = () => ({
+  'Content-Type': 'application/json',
+});
+
+const handleResponse = async (response) => {
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : {};
+  if (!response.ok) {
+    const error = new Error(data.message || data.error || 'Network response error');
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+  return data;
 };
 
 export const api = {
-  login: (data) => fetch(`${API_BASE}/auth/login`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) }).then(r => r.json()),
-  register: (data) => fetch(`${API_BASE}/auth/register`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) }).then(r => r.json()),
-  getMe: () => fetch(`${API_BASE}/auth/me`, { headers: getHeaders() }).then(r => r.json()),
-  transfer: (data) => fetch(`${API_BASE}/transactions/transfer`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(data) }).then(r => r.json()),
-  getHistory: () => fetch(`${API_BASE}/transactions/history`, { headers: getHeaders() }).then(r => r.json())
+  register: (userData) =>
+    fetch(`${API_BASE}${ENDPOINTS.USERS.REGISTER}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(userData),
+    }).then(handleResponse),
+
+  getUsers: () =>
+    fetch(`${API_BASE}${ENDPOINTS.USERS.LIST}`, {
+      headers: getHeaders(),
+    }).then(handleResponse),
+
+  transfer: (payload) =>
+    fetch(`${API_BASE}${ENDPOINTS.TRANSACTIONS.TRANSFER}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload),
+    }).then(handleResponse),
+
+  getAllTransactions: () =>
+    fetch(`${API_BASE}${ENDPOINTS.TRANSACTIONS.ALL}`, {
+      headers: getHeaders(),
+    }).then(handleResponse),
 };
+
+export default api;

@@ -1,61 +1,49 @@
 import subprocess
 import sys
 import os
-
-def install_backend_deps(backend_dir):
-    req_file = os.path.join(backend_dir, 'requirements.txt')
-    if os.path.exists(req_file):
-        print("🔍 Checking Python backend dependencies...")
-        subprocess.check_call(
-            [sys.executable, '-m', 'pip', 'install', '-r', req_file],
-            cwd=backend_dir
-        )
-
-def install_frontend_deps(frontend_dir):
-    node_modules = os.path.join(frontend_dir, 'node_modules')
-    package_json = os.path.join(frontend_dir, 'package.json')
-    
-    # Only run npm install if node_modules does not exist
-    if os.path.exists(package_json) and not os.path.exists(node_modules):
-        print("📦 'node_modules' missing. Running 'npm install'...")
-        subprocess.check_call(
-            ['npm', 'install'],
-            cwd=frontend_dir,
-            shell=True if os.name == 'nt' else False
-        )
-    else:
-        print("✅ Frontend dependencies already installed.")
+import signal
 
 def run():
     root = os.path.dirname(os.path.abspath(__file__))
-    backend_dir = os.path.join(root, 'backend')
-    frontend_dir = os.path.join(root, 'frontend')
+    backend_dir = os.path.join(root, 'Backend')
+    frontend_dir = os.path.join(root, 'Frontend')
 
-    # Step 1: Handle dependencies automatically
-    install_backend_deps(backend_dir)
-    install_frontend_deps(frontend_dir)
+    # Detect executable for npx on Windows
+    npx_cmd = 'npx.cmd' if os.name == 'nt' else 'npx'
 
-    # Step 2: Start servers
     print("\n🚀 Launching Flask Backend (Port 5000)...")
     backend_proc = subprocess.Popen(
-        [sys.executable, 'run.py'],
+        [sys.executable, 'app.py'],
         cwd=backend_dir
     )
 
-    print("🚀 Launching React Frontend (Port 3000)...")
+    print("🚀 Launching React Frontend (Vite on port 3000 / fallback if needed)...")
     frontend_proc = subprocess.Popen(
-        ['npx', 'vite'],
+        [npx_cmd, 'vite', '--host', '0.0.0.0', '--port', '3000'],
         cwd=frontend_dir,
-        shell=True if os.name == 'nt' else False
+        env={**os.environ, 'BROWSER': 'none'}
     )
 
     try:
         backend_proc.wait()
         frontend_proc.wait()
     except KeyboardInterrupt:
-        print("\nTerminating services...")
-        backend_proc.terminate()
-        frontend_proc.terminate()
+        print("\n🛑 Shutting down services...")
+        
+        # Gracefully terminate processes
+        for proc in (backend_proc, frontend_proc):
+            if proc and proc.poll() is None:
+                proc.terminate()
+
+        # Force kill if they don't exit cleanly
+        try:
+            backend_proc.wait(timeout=3)
+            frontend_proc.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            backend_proc.kill()
+            frontend_proc.kill()
+            
+        print("Done.")
 
 if __name__ == '__main__':
     run()
