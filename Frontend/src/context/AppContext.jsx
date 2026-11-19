@@ -12,6 +12,7 @@ export const AppProvider = ({ children }) => {
   const [depositModalUser, setDepositModalUser] = useState(null);
   const [prefilledSender, setPrefilledSender] = useState(null);
   const [currentView, setCurrentView] = useState('dashboard');
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const showToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -93,6 +94,8 @@ export const AppProvider = ({ children }) => {
         currentView,
         setCurrentView,
         navigateToSendMoney,
+        isChatOpen,
+        setIsChatOpen,
       }}
     >
       {children}

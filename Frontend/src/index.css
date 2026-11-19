@@ -592,3 +592,13 @@ tbody tr:last-child td {
     align-items: flex-start;
   }
 }
+@keyframes drawerSlideLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

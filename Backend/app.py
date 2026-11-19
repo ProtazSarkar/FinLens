@@ -1,5 +1,6 @@
 import os
 
+from api.chat import chat_bp
 from api.transaction import transaction_bp
 from api.user import user_bp
 from config import Config
@@ -46,6 +47,7 @@ def create_app():
     # Register Blueprints according to README route specifications
     app.register_blueprint(user_bp, url_prefix="/api/user")
     app.register_blueprint(transaction_bp, url_prefix="/api/transaction")
+    app.register_blueprint(chat_bp, url_prefix="/api/chat")
 
     @app.route("/api/health", methods=["GET"])
     def health():

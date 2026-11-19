@@ -2,12 +2,14 @@ import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
+import AiAnalytics from './pages/AiAnalytics';
 import Transfer from './pages/Transfer';
 import Transactions from './pages/Transactions';
 import Users from './pages/Users';
 import Register from './pages/Register';
 import DepositModal from './components/DepositModal';
 import Toast from './components/Toast';
+import ChatBotDrawer from './components/ChatBotDrawer';
 
 function AppContent() {
   const { currentView } = useApp();
@@ -18,6 +20,7 @@ function AppContent() {
 
       <main style={{ flex: 1 }}>
         {currentView === 'dashboard' && <Dashboard />}
+        {currentView === 'ai-analytics' && <AiAnalytics />}
         {currentView === 'transfer' && <Transfer />}
         {currentView === 'transactions' && <Transactions />}
         {currentView === 'users' && <Users />}
@@ -54,6 +57,7 @@ function AppContent() {
       {/* Global Modals & Notifications */}
       <DepositModal />
       <Toast />
+      <ChatBotDrawer />
     </div>
   );
 }

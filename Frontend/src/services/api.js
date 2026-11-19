@@ -17,6 +17,11 @@ export const ENDPOINTS = {
     ALL: '/transaction/history/all',
     BY_USER: (id) => `/transaction/history/${id}`,
   },
+  CHAT: {
+    ASK: '/chat/ask',
+    SUGGESTIONS: '/chat/suggestions',
+    RECURRENCE: '/chat/recurrence',
+  },
   HEALTH: '/health',
 };
 
@@ -131,6 +136,30 @@ export const api = {
     fetch(`${API_BASE}${ENDPOINTS.HEALTH}`, {
       headers: getHeaders(),
     }).then(handleResponse),
+
+  // NL-to-SQL & Chatbot endpoints
+  askChat: (prompt, activeUserId = null, forceExecute = false) =>
+    fetch(`${API_BASE}${ENDPOINTS.CHAT.ASK}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        prompt,
+        active_user_id: activeUserId,
+        force_execute: forceExecute,
+      }),
+    }).then(handleResponse),
+
+  getChatSuggestions: () =>
+    fetch(`${API_BASE}${ENDPOINTS.CHAT.SUGGESTIONS}`, {
+      headers: getHeaders(),
+    }).then(handleResponse),
+
+  getRecurrenceInsights: (userId = null) => {
+    const q = userId ? `?user_id=${userId}` : '';
+    return fetch(`${API_BASE}${ENDPOINTS.CHAT.RECURRENCE}${q}`, {
+      headers: getHeaders(),
+    }).then(handleResponse);
+  },
 };
 
 export default api;

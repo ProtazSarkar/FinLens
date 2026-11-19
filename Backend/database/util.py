@@ -205,8 +205,43 @@ def get_ledger_stats():
         for pm, count, amount in pm_rows
     ]
 
+    # Top Inflow Merchants
+    merchant_rows = (
+        db.session.query(
+            UserBasicDetails.username,
+            func.count(TransactionLog.id).label("count"),
+            func.coalesce(func.sum(TransactionLog.amount), 0.0).label("total_amount"),
+        )
+        .join(UserBasicDetails, UserBasicDetails.id == TransactionLog.receiver_id)
+        .filter(UserBasicDetails.user_type == "Business")
+        .group_by(UserBasicDetails.username)
+        .order_by(func.sum(TransactionLog.amount).desc())
+        .limit(5)
+        .all()
+    )
+    top_merchants = [
+        {"name": name, "count": count, "total_amount": round(float(amount), 2)}
+        for name, count, amount in merchant_rows
+    ]
+
+    # Monthly Trends (aggregated over all tx logs)
+    all_txs = TransactionLog.query.order_by(TransactionLog.timestamp.asc()).all()
+    monthly_map = {}
+    for tx in all_txs:
+        if tx.timestamp:
+            m_key = tx.timestamp.strftime("%Y-%m")
+            m_label = tx.timestamp.strftime("%b %Y")
+            if m_key not in monthly_map:
+                monthly_map[m_key] = {"month": m_key, "label": m_label, "total_amount": 0.0, "count": 0}
+            monthly_map[m_key]["total_amount"] += float(tx.amount)
+            monthly_map[m_key]["count"] += 1
+
+    monthly_trends = sorted(list(monthly_map.values()), key=lambda x: x["month"])
+    for m in monthly_trends:
+        m["total_amount"] = round(m["total_amount"], 2)
+
     # Recent transactions
-    recent = fetch_transactions_with_classification(limit=5)
+    recent = fetch_transactions_with_classification(limit=6)
 
     return {
         "total_transactions": total_tx,
@@ -216,6 +251,8 @@ def get_ledger_stats():
         "total_liquidity": round(float(total_liquidity), 2),
         "categories": categories,
         "payment_methods": payment_methods,
+        "top_merchants": top_merchants,
+        "monthly_trends": monthly_trends,
         "recent_transactions": recent,
     }
 

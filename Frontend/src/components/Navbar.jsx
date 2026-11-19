@@ -9,6 +9,7 @@ import {
   PlusIcon,
   RefreshIcon,
   WalletIcon,
+  BotIcon,
 } from './Icons';
 
 export default function Navbar() {
@@ -20,6 +21,7 @@ export default function Navbar() {
     setActiveUser,
     refreshAll,
     navigateToSendMoney,
+    setIsChatOpen,
   } = useApp();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -31,7 +33,8 @@ export default function Navbar() {
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'Analytics', icon: ChartIcon },
+    { id: 'dashboard', label: 'Dashboard', icon: ChartIcon },
+    { id: 'ai-analytics', label: 'AI Analytics', icon: SparklesIcon },
     { id: 'transfer', label: 'Send Money', icon: SendIcon },
     { id: 'transactions', label: 'Ledger History', icon: HistoryIcon },
     { id: 'users', label: 'Accounts', icon: UsersIcon },
@@ -217,6 +220,17 @@ export default function Navbar() {
             }}
           >
             <RefreshIcon size={16} className={refreshing ? 'animate-spin' : ''} />
+          </button>
+
+          {/* AI Copilot Button */}
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="btn-subtle btn-sm"
+            style={{ padding: '0.5rem 0.9rem', color: 'var(--ai)', borderColor: 'var(--ai-border)', background: 'var(--ai-bg)' }}
+            title="Open FinLens NL-to-SQL Analytics Copilot"
+          >
+            <SparklesIcon size={15} />
+            <span>AI Copilot</span>
           </button>
 
           {/* Quick Send Button */}
